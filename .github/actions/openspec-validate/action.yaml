@@ -1,0 +1,13 @@
+name: Validate OpenSpec
+description: Validate OpenSpec change proposals
+
+runs:
+  using: composite
+  steps:
+    - name: Install OpenSpec
+      shell: bash
+      run: npm install -g openspec
+
+    - name: Validate OpenSpec Changes
+      shell: bash
+      run: openspec validate --strict

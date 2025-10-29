@@ -1,0 +1,23 @@
+name: Static Analysis
+description: Run linting, type checking, and formatting checks
+
+runs:
+  using: composite
+  steps:
+    - name: Lint Code
+      shell: bash
+      run: bun run lint
+
+    - name: Type Check
+      shell: bash
+      run: bun run typecheck
+
+    # TODO: Add formatting check when prettier/biome configured
+    # - name: Check Formatting
+    #   shell: bash
+    #   run: bun run format:check
+
+    # TODO: Add markdown linting when configured
+    # - name: Lint Markdown
+    #   shell: bash
+    #   run: bun run lint:md

@@ -1,0 +1,139 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+  merge_group:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup
+        uses: ./.github/actions/setup-bun
+      - name: Static Analysis
+        uses: ./.github/actions/static-analysis
+      - name: Build Packages
+        uses: ./.github/actions/build-packages
+
+  openspec:
+    runs-on: ubuntu-latest
+    # Only run if openspec files changed
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' &&
+       contains(github.event.pull_request.changed_files, 'openspec/'))
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate OpenSpec
+        uses: ./.github/actions/openspec-validate
+
+  # TODO: Add when tests are written
+  # unit-tests:
+  #   if: github.event.pull_request.draft == false
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Setup
+  #       uses: ./.github/actions/setup-bun
+  #     - name: Build Packages
+  #       uses: ./.github/actions/build-packages
+  #     - name: Unit Tests
+  #       shell: bash
+  #       run: bun test
+
+  # TODO: Add when PostgreSQL integration tests are ready
+  # integration-tests:
+  #   if: github.event_name != 'merge_group' && github.event.pull_request.draft == false
+  #   runs-on: ubuntu-latest
+  #   needs: [static-analysis]
+  #   services:
+  #     postgres:
+  #       image: pgvector/pgvector:pg17
+  #       env:
+  #         POSTGRES_PASSWORD: postgres
+  #       options: >-
+  #         --health-cmd pg_isready
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+  #       ports:
+  #         - 5432:5432
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Setup
+  #       uses: ./.github/actions/setup-bun
+  #     - name: Build Packages
+  #       uses: ./.github/actions/build-packages
+  #     - name: Integration Tests
+  #       shell: bash
+  #       run: bun test:integration
+  #       env:
+  #         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
+
+  ci-summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [static-analysis, openspec]
+    steps:
+      - name: Check Workflow Status
+        run: |
+          # Helper function to fail on specific job results
+          exit_on_result() {
+            if [[ "$2" == "failure" ]]; then
+              echo "❌ Job '$1' failed"
+              exit 1
+            elif [[ "$2" == "cancelled" ]]; then
+              echo "🚫 Job '$1' was cancelled"
+              exit 1
+            fi
+          }
+
+          # Create GitHub Step Summary
+          echo "## 📊 CI Status Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status | Required |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Static Analysis | \`${{ needs.static-analysis.result }}\` | ✅ Yes |" >> $GITHUB_STEP_SUMMARY
+          echo "| OpenSpec | \`${{ needs.openspec.result }}\` | ⚠️ Conditional |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "🔍 Checking CI job results..."
+          echo ""
+          echo "📊 Job Results:"
+          echo "  Static Analysis: ${{ needs.static-analysis.result }}"
+          echo "  OpenSpec: ${{ needs.openspec.result }}"
+          echo ""
+
+          # Required jobs (must not fail or be cancelled)
+          exit_on_result "static-analysis" "${{ needs.static-analysis.result }}"
+
+          # OpenSpec is conditional - only fail if it ran and failed
+          OPENSPEC="${{ needs.openspec.result }}"
+          if [[ "$OPENSPEC" == "failure" ]]; then
+            echo "❌ OpenSpec validation failed"
+            exit 1
+          elif [[ "$OPENSPEC" == "skipped" ]]; then
+            echo "⏭️ OpenSpec validation skipped (no changes)"
+            echo "**Note:** OpenSpec validation skipped (no openspec/ changes)" >> $GITHUB_STEP_SUMMARY
+          elif [[ "$OPENSPEC" == "success" ]]; then
+            echo "✅ OpenSpec validation passed"
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**View full run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+
+          echo ""
+          echo "✅ Required checks passed - ready for merge"

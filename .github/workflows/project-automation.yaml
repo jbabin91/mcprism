@@ -1,0 +1,81 @@
+name: Project Automation
+
+on:
+  issues:
+    types: [opened, assigned, closed, reopened]
+  pull_request:
+    types: [opened, ready_for_review, converted_to_draft, closed]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  update-issue-status:
+    if: github.event_name == 'issues'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine Status
+        id: status
+        run: |
+          case "${{ github.event.action }}" in
+            opened)
+              echo "status=Backlog" >> $GITHUB_OUTPUT
+              echo "📋 Issue opened - setting to Backlog"
+              ;;
+            assigned)
+              echo "status=In Progress" >> $GITHUB_OUTPUT
+              echo "🚀 Issue assigned - setting to In Progress"
+              ;;
+            closed)
+              echo "status=Done" >> $GITHUB_OUTPUT
+              echo "✅ Issue closed - setting to Done"
+              ;;
+            reopened)
+              echo "status=Backlog" >> $GITHUB_OUTPUT
+              echo "🔄 Issue reopened - setting to Backlog"
+              ;;
+          esac
+
+      # TODO: Implement project status update via GraphQL
+      # For now, this is handled by GitHub Project native workflows
+      - name: Log Status Update
+        run: |
+          echo "Would update project status to: ${{ steps.status.outputs.status }}"
+          echo "Issue #${{ github.event.issue.number }}"
+
+  update-pr-status:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine Status
+        id: status
+        run: |
+          if [ "${{ github.event.action }}" == "opened" ] && [ "${{ github.event.pull_request.draft }}" == "true" ]; then
+            echo "status=In Progress" >> $GITHUB_OUTPUT
+            echo "🚧 Draft PR opened - setting to In Progress"
+          elif [ "${{ github.event.action }}" == "converted_to_draft" ]; then
+            echo "status=In Progress" >> $GITHUB_OUTPUT
+            echo "🚧 PR converted to draft - setting to In Progress"
+          elif [ "${{ github.event.action }}" == "ready_for_review" ]; then
+            echo "status=In Review" >> $GITHUB_OUTPUT
+            echo "👀 PR ready for review - setting to In Review"
+          elif [ "${{ github.event.action }}" == "opened" ] && [ "${{ github.event.pull_request.draft }}" == "false" ]; then
+            echo "status=In Review" >> $GITHUB_OUTPUT
+            echo "👀 PR opened (ready) - setting to In Review"
+          elif [ "${{ github.event.action }}" == "closed" ] && [ "${{ github.event.pull_request.merged }}" == "true" ]; then
+            echo "status=Done" >> $GITHUB_OUTPUT
+            echo "✅ PR merged - setting to Done"
+          else
+            echo "status=" >> $GITHUB_OUTPUT
+            echo "⏭️ No status change needed"
+          fi
+
+      # TODO: Implement project status update via GraphQL
+      # For now, this is handled by GitHub Project native workflows
+      - name: Log Status Update
+        if: steps.status.outputs.status != ''
+        run: |
+          echo "Would update project status to: ${{ steps.status.outputs.status }}"
+          echo "PR #${{ github.event.pull_request.number }}"

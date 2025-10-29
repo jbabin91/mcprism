@@ -1,0 +1,13 @@
+name: Build Packages
+description: Build all Turborepo packages
+
+runs:
+  using: composite
+  steps:
+    - name: Build All Packages
+      shell: bash
+      run: bun run build
+      env:
+        # Optional: Enable Turborepo remote caching
+        TURBO_TOKEN: ${{ env.TURBO_TOKEN }}
+        TURBO_TEAM: ${{ env.TURBO_TEAM }}
