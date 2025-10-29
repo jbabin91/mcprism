@@ -2,6 +2,9 @@
 
 > Progressive Tool Disclosure for MCP Servers
 
+> [!WARNING]
+> **Work in Progress** - MCPrism is in early development. The API and features described below are planned but not yet fully implemented. Check the [Project Status](#project-status) section for current progress.
+
 MCPrism is an open-source MCP gateway that helps reduce context window usage through progressive tool disclosure.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
