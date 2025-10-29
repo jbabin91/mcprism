@@ -1,135 +1,261 @@
-# Turborepo starter
+# MCPrism 🌈
 
-This Turborepo starter is maintained by the Turborepo core team.
+> Progressive Tool Disclosure for MCP Servers
 
-## Using this example
+MCPrism is an open-source MCP gateway that saves 98% of your context window through progressive tool disclosure.
 
-Run the following command:
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Built with Bun](https://img.shields.io/badge/built%20with-Bun-black)](https://bun.sh)
 
-```sh
-npx create-turbo@latest
-```
+## What is Progressive Tool Disclosure?
 
-## What's inside?
+Like a prism refracts light into a spectrum revealed progressively, MCPrism refracts your MCP tool stack into layers disclosed only when needed:
 
-This Turborepo includes the following packages/apps:
+- **Load metadata** upfront (~900 tokens)
+- **Search semantically** for tools you need
+- **Fetch schemas** on-demand (+700 tokens each)
+- **Save 98.6%** of your context window
 
-### Apps and Packages
+### The Problem
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+Loading 88 MCP tools consumes **64,600 tokens** (32% of Claude's 200k context) before you even start chatting.
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### The Solution
 
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+MCPrism uses progressive disclosure to load tool metadata upfront and full schemas on-demand:
 
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+Before:  64,600 tokens (32% of context)
+After:      900 tokens (0.45% of context)
+Savings:  98.6% reduction ✨
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+## Features
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+- 🌈 **Progressive Disclosure** - Load tools on-demand, not upfront
+- 🔍 **Semantic Search** - Find tools with natural language queries
+- 🔐 **RBAC** - Organization, team, and user-level permissions
+- 🐳 **Self-Hosted** - Docker Compose, Coolify, or manual deployment
+- 🌐 **Web UI** - Manage MCP servers without CLI (coming soon)
+- 🔧 **MCP Tools** - Configure gateway via natural language (coming soon)
+- 📊 **PostgreSQL + pgvector** - Semantic search with vector embeddings
+- ⚡ **Fast** - Built with Elysia.js on Bun runtime
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+## Quick Start
 
-### Develop
+### Prerequisites
 
-To develop all apps and packages, run the following command:
+- [Bun](https://bun.sh) v1.0+
+- [Docker](https://docker.com) (for PostgreSQL)
+- Node.js v18+ (optional, for npm compatibility)
 
-```
-cd my-turborepo
+### Installation
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+```bash
+# Clone repository
+git clone https://github.com/jbabin91/mcprism.git
+cd mcprism
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+# Install dependencies
+bun install
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+# Start PostgreSQL
+docker compose up -d
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+# Copy environment file
+cp .env.example .env
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+# Run database migrations (coming soon)
+# bun run db:migrate
 
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+# Start development servers
+bun run dev
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+### URLs
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+- **Gateway API:** http://localhost:3001 (coming soon)
+- **Web UI:** http://localhost:3000 (coming soon)
+- **Documentation:** http://localhost:3002 (coming soon)
+
+## Architecture
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+mcprism/
+├── apps/
+│   ├── gateway/          # Elysia.js backend (MCP gateway)
+│   ├── web/              # TanStack Start frontend (coming soon)
+│   └── docs/             # Fumadocs documentation (coming soon)
+├── packages/
+│   ├── db/               # Drizzle ORM + PostgreSQL schemas
+│   ├── auth/             # Better Auth (coming soon)
+│   ├── types/            # Shared TypeScript types
+│   └── ui/               # Base UI components (coming soon)
+└── docker-compose.yml    # PostgreSQL + pgvector
 ```
 
-## Useful Links
+## Tech Stack
 
-Learn more about the power of Turborepo:
+### Backend
+- **[Bun](https://bun.sh)** - Fast JavaScript runtime (4x faster than Node.js)
+- **[Elysia.js](https://elysiajs.com)** - High-performance web framework (3x faster than Hono)
+- **[Drizzle ORM](https://orm.drizzle.team)** - TypeScript-first ORM
+- **[PostgreSQL](https://postgresql.org) + [pgvector](https://github.com/pgvector/pgvector)** - Vector database for semantic search
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+### Frontend (Coming Soon)
+- **[TanStack Start](https://tanstack.com/start)** - Modern React framework
+- **[Base UI](https://base-ui.com)** - Unstyled component primitives
+- **[Tailwind CSS](https://tailwindcss.com)** - Utility-first styling
+- **[TanStack Query](https://tanstack.com/query)** - Data fetching & caching
+- **[TanStack Form](https://tanstack.com/form)** - Type-safe forms
+
+### Infrastructure
+- **[Turborepo](https://turbo.build/repo)** - High-performance monorepo
+- **[Docker Compose](https://docs.docker.com/compose/)** - Local development
+- **[Coolify](https://coolify.io)** - Self-hosted deployment (coming soon)
+
+## Development
+
+### Available Commands
+
+```bash
+# Development
+bun run dev              # Start all apps
+bun run dev --filter=@mcprism/gateway  # Start gateway only
+
+# Build
+bun run build            # Build all apps
+bun run build --filter=@mcprism/gateway
+
+# Database
+bun run db:generate      # Generate migrations (coming soon)
+bun run db:migrate       # Run migrations (coming soon)
+bun run db:studio        # Open Drizzle Studio (coming soon)
+
+# Linting & Type-checking
+bun run lint             # Lint all code
+bun run typecheck        # Type-check all code
+
+# Docker
+docker compose up -d     # Start PostgreSQL
+docker compose down      # Stop services
+docker compose logs -f postgres  # View logs
+```
+
+### Project Status
+
+This project is in active development. Current status:
+
+- ✅ Domain registered: [mcprism.dev](https://mcprism.dev)
+- ✅ Proof-of-concept validated (98.6% context savings)
+- ✅ Repository created: [github.com/jbabin91/mcprism](https://github.com/jbabin91/mcprism)
+- ✅ Turborepo monorepo initialized
+- ✅ Gateway app structure (migrating from POC)
+- 🚧 Database package (Drizzle + PostgreSQL)
+- 🚧 Web UI (TanStack Start)
+- 🚧 Documentation (Fumadocs)
+- 🚧 Authentication (Better Auth)
+- 🚧 RBAC system
+
+## How It Works
+
+### 1. Traditional MCP Client (Before)
+
+```typescript
+// Client loads ALL tool schemas upfront
+const tools = await client.listTools();
+// Result: 64,600 tokens for 88 tools 😱
+```
+
+### 2. MCPrism Gateway (After)
+
+```typescript
+// 1. Load minimal metadata (~900 tokens)
+const tools = await mcprism.searchTools("read file");
+// Returns: [{ name: "read_file", description: "...", server: "filesystem" }]
+
+// 2. Fetch full schema on-demand (~700 tokens)
+const schema = await mcprism.getToolSchema("read_file");
+
+// 3. Execute tool
+const result = await mcprism.executeTool("read_file", { path: "/tmp/foo.txt" });
+```
+
+**Result:** Only load what you need, when you need it.
+
+## Roadmap
+
+### Phase 1: Core Gateway (Current)
+- [x] Initialize Turborepo monorepo
+- [x] POC validation (98.6% savings)
+- [ ] Migrate POC to production structure
+- [ ] PostgreSQL + pgvector integration
+- [ ] MCP protocol client
+- [ ] Semantic search engine
+- [ ] Progressive disclosure API
+
+### Phase 2: Web Interface
+- [ ] TanStack Start app setup
+- [ ] Base UI component library
+- [ ] Server management UI
+- [ ] Tool browser & search
+- [ ] Real-time monitoring
+
+### Phase 3: Authentication & RBAC
+- [ ] Better Auth integration
+- [ ] User management
+- [ ] Organization & team support
+- [ ] Permission system
+- [ ] SSO/OIDC for enterprise
+
+### Phase 4: Documentation & Launch
+- [ ] Fumadocs site
+- [ ] Getting started guides
+- [ ] API documentation
+- [ ] Deployment guides (Docker, Coolify)
+- [ ] Show HN launch
+
+### Phase 5: Advanced Features
+- [ ] Natural language MCP configuration
+- [ ] Tool usage analytics
+- [ ] Cost tracking
+- [ ] Multi-region deployment
+- [ ] Kubernetes support
+
+## Contributing
+
+Contributions welcome! This project is just getting started.
+
+**Current needs:**
+- Logo design (geometric prism + spectrum)
+- Documentation writers
+- Frontend developers (TanStack Start + Base UI)
+- Backend developers (Elysia + Drizzle)
+- DevOps (Docker, Coolify templates)
+
+**Coming soon:**
+- CONTRIBUTING.md
+- CODE_OF_CONDUCT.md
+- Developer setup guide
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## Credits
+
+Built with:
+- Inspired by [Model Context Protocol](https://spec.modelcontextprotocol.io)
+- Validated through proof-of-concept testing
+- Community feedback from MCP Discord
+
+## Links
+
+- **Website:** [mcprism.dev](https://mcprism.dev) (coming soon)
+- **Documentation:** [docs.mcprism.dev](https://docs.mcprism.dev) (coming soon)
+- **GitHub:** [github.com/jbabin91/mcprism](https://github.com/jbabin91/mcprism)
+- **Issues:** [github.com/jbabin91/mcprism/issues](https://github.com/jbabin91/mcprism/issues)
+
+---
+
+**Like a prism refracts light, MCPrism refracts tool access.** 🌈

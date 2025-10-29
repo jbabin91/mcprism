@@ -1,0 +1,14 @@
+{
+  "name": "@mcprism/auth",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "better-auth": "^1.1.8",
+    "drizzle-orm": "^0.36.4",
+    "@mcprism/db": "workspace:*"
+  }
+}
