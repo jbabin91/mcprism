@@ -2,7 +2,7 @@
 
 > Progressive Tool Disclosure for MCP Servers
 
-MCPrism is an open-source MCP gateway that saves 98% of your context window through progressive tool disclosure.
+MCPrism is an open-source MCP gateway that helps reduce context window usage through progressive tool disclosure.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Built with Bun](https://img.shields.io/badge/built%20with-Bun-black)](https://bun.sh)
@@ -11,23 +11,23 @@ MCPrism is an open-source MCP gateway that saves 98% of your context window thro
 
 Like a prism refracts light into a spectrum revealed progressively, MCPrism refracts your MCP tool stack into layers disclosed only when needed:
 
-- **Load metadata** upfront (~900 tokens)
+- **Load lightweight metadata** upfront instead of full schemas
 - **Search semantically** for tools you need
-- **Fetch schemas** on-demand (+700 tokens each)
-- **Save 98.6%** of your context window
+- **Fetch complete schemas** only when needed
+- **Reduce context usage** by loading tools on-demand
 
 ### The Problem
 
-Loading 88 MCP tools consumes **64,600 tokens** (32% of Claude's 200k context) before you even start chatting.
+Traditional MCP clients load all tool schemas upfront, consuming a significant portion of your context window before you start your conversation. With many MCP servers enabled, this can mean tens of thousands of tokens used just for tool definitions.
 
 ### The Solution
 
-MCPrism uses progressive disclosure to load tool metadata upfront and full schemas on-demand:
+MCPrism acts as a gateway between your AI client and MCP servers, implementing progressive disclosure:
 
 ```
-Before:  64,600 tokens (32% of context)
-After:      900 tokens (0.45% of context)
-Savings:  98.6% reduction ✨
+Traditional:  Load all tool schemas → High context usage
+MCPrism:      Load metadata → Search → Fetch schemas as needed
+Result:       Significantly reduced context usage
 ```
 
 ## Features
@@ -147,7 +147,7 @@ docker compose logs -f postgres  # View logs
 This project is in active development. Current status:
 
 - ✅ Domain registered: [mcprism.dev](https://mcprism.dev)
-- ✅ Proof-of-concept validated (98.6% context savings)
+- ✅ Proof-of-concept validated
 - ✅ Repository created: [github.com/jbabin91/mcprism](https://github.com/jbabin91/mcprism)
 - ✅ Turborepo monorepo initialized
 - ✅ Gateway app structure (migrating from POC)
@@ -159,22 +159,22 @@ This project is in active development. Current status:
 
 ## How It Works
 
-### 1. Traditional MCP Client (Before)
+### 1. Traditional MCP Client
 
 ```typescript
 // Client loads ALL tool schemas upfront
 const tools = await client.listTools();
-// Result: 64,600 tokens for 88 tools 😱
+// All schemas loaded into context immediately
 ```
 
-### 2. MCPrism Gateway (After)
+### 2. MCPrism Gateway
 
 ```typescript
-// 1. Load minimal metadata (~900 tokens)
+// 1. Search for tools using natural language
 const tools = await mcprism.searchTools("read file");
 // Returns: [{ name: "read_file", description: "...", server: "filesystem" }]
 
-// 2. Fetch full schema on-demand (~700 tokens)
+// 2. Fetch full schema only when needed
 const schema = await mcprism.getToolSchema("read_file");
 
 // 3. Execute tool
@@ -187,7 +187,7 @@ const result = await mcprism.executeTool("read_file", { path: "/tmp/foo.txt" });
 
 ### Phase 1: Core Gateway (Current)
 - [x] Initialize Turborepo monorepo
-- [x] POC validation (98.6% savings)
+- [x] Proof-of-concept validation
 - [ ] Migrate POC to production structure
 - [ ] PostgreSQL + pgvector integration
 - [ ] MCP protocol client
